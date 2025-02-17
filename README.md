@@ -1,4 +1,7 @@
-This code uses space vector modulation with min-max injection to rotate an induction motor using the V/f method.
+In my capstone project at BCIT we are converting an Indy race car to electric
+I am in charge of creating a custom motor controller to operate the induction motor.
+
+This code uses a TI C2000 microcontroller to incorporate space vector modulation with min-max injection to rotate an induction motor using the V/f method.
 
 Field Oriented Control coming soon.
 
