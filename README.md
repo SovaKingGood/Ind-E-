@@ -3,6 +3,9 @@ This code uses space vector modulation with min-max injection to rotate an induc
 Field Oriented Control coming soon.
 
 ![Ind-E](https://github.com/user-attachments/assets/82befbf6-10aa-4242-a93e-d52da07a9c81)
+![Testbench](https://github.com/user-attachments/assets/f2d223f2-8e30-4c38-ace2-d1aaa8108462)
+![Motor Testing](https://github.com/user-attachments/assets/38aa79b4-a6cd-4843-a956-04ad06de7af9)
+![FETS on heatsink](https://github.com/user-attachments/assets/5e8ec779-4d34-429b-82c1-170fc7cc7f62)
 
 ![Motor](https://github.com/user-attachments/assets/1feddf1a-9a68-40f9-a0c9-53b71558b7ca)
 
