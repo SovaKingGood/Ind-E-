@@ -1,5 +1,6 @@
 // Ind-E Motor Controller
 // Created by Brennan Pinette
+// Feb 17 2025
 //
 // Included Files
 //
@@ -42,7 +43,7 @@ volatile float T2;
 volatile float T0;
 
 volatile float modulation_index = 0.5f; // duty_cycle
-volatile float V_DC = 15.0f; // duty_cycle
+volatile float V_DC = 30.0f; 
 volatile float V_ref;
 
 float pot;
@@ -52,8 +53,12 @@ float pot;
 
 
 
-#define PWM_Period 50
-#define PWM_ClockDivider 128
+#define PWM_Period 200.0f
+#define PWM_ClockDivider 20.0f
+
+#define Duty_Cycle_Scalar 30.0f
+#define frequency_rated 60.0f
+#define boostV 1.6f
 
 
 
@@ -92,7 +97,7 @@ void main(void)
         adcResult = ADC_readResult(myADC0_RESULT_BASE,  myADC0_SOC0); // 0 - 4095
 
         //printf("%d\r\n", adcResult);
-        pot = round(adcResult * 60.0f/4095.0f);
+        pot = roundf(adcResult * frequency_rated/4095.0f);
 
      
 
@@ -106,7 +111,7 @@ void main(void)
 
         // // Toggle Green and Blue LEDs (D9/D10)
         // GPIO_togglePin(31);  // Toggle Green and Blue LEDs (D9/D10)
-        DEVICE_DELAY_US(5000);  // Delay 50ms
+        DEVICE_DELAY_US(50000);  // Delay 50ms
     }
 }
 
@@ -120,9 +125,6 @@ __interrupt void INT_PhaseA_ISR(void){
     GPIO_togglePin(myGPIO0);
 
     frequency = pot;
-    modulation_index = pot/60;
-
-
 
     //increment angle
     angle = angle + 2.0f * M_PI * frequency * ((PWM_Period * PWM_ClockDivider) / 200000000.0f);
@@ -135,7 +137,8 @@ __interrupt void INT_PhaseA_ISR(void){
 
 
 
-    V_ref = modulation_index * sqrtf(3.0f)/2.0f * V_DC;
+    V_ref = boostV * (frequency/frequency_rated) * V_DC/sqrtf(3.0f);
+    //V_ref = 17.0f;
 
     V_Alpha = V_ref * cosf(angle);
     V_Beta = V_ref * sinf(angle);
@@ -163,7 +166,7 @@ __interrupt void INT_PhaseA_ISR(void){
     //Clarke transform
 
     V_Alpha = Va;
-    V_Beta = (sqrtf(3.0f)/3.0f) * (Vb - Vc);
+    V_Beta = (sqrtf(3.0f))/2.0f * (Vb - Vc);
 
     angle_calculated = atan2f(V_Beta,V_Alpha);
 
@@ -187,10 +190,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(60.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 0.0f*M_PI/180.0f ))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T1+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T1+T0);   
 
 
             EPWM_setCounterCompareValue(PhaseA_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -226,10 +229,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(120.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 60.0f*M_PI/180.0f ))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T1+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T1+T0);   
 
 
             EPWM_setCounterCompareValue(PhaseA_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -266,10 +269,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(180.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 120.0f*M_PI/180.0f ))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T1+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T1+T0);   
 
 
             EPWM_setCounterCompareValue(PhaseA_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -305,10 +308,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(240.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 180.0f*M_PI/180.0f ))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T1+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T1+T0);   
 
 
             EPWM_setCounterCompareValue(PhaseA_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -344,10 +347,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(300.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 240.0f*M_PI/180.0f ))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T1+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T1+T0);   
 
 
             EPWM_setCounterCompareValue(PhaseA_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -383,10 +386,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(360.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 300.0f*M_PI/180.0f ))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T1+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T1+T0);   
 
 
             EPWM_setCounterCompareValue(PhaseA_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -428,10 +431,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(60.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 0.0f*M_PI/180.0f))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T2+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T2+T0);   
             
 
             EPWM_setCounterCompareValue(PhaseC_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -466,10 +469,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(120.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 60.0f*M_PI/180.0f))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T2+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T2+T0);   
             
 
             EPWM_setCounterCompareValue(PhaseC_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -504,10 +507,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(180.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 120.0f*M_PI/180.0f))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T2+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T2+T0);   
             
 
             EPWM_setCounterCompareValue(PhaseC_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -542,10 +545,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(240.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 180.0f*M_PI/180.0f))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T2+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T2+T0);   
             
 
             EPWM_setCounterCompareValue(PhaseC_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -580,10 +583,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(300.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 240.0f*M_PI/180.0f))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T2+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T2+T0);   
             
 
             EPWM_setCounterCompareValue(PhaseC_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
@@ -618,10 +621,10 @@ __interrupt void INT_PhaseA_ISR(void){
 
             T1 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(360.0f*M_PI/180.0f - angle_calculated))/V_DC; //V1
             T2 = (sqrtf(3.0f)*PWM_Period*V_ref*sinf(angle_calculated - 300.0f*M_PI/180.0f))/V_DC; //V2
-            T0 = (PWM_Period - T1 - T2)/2;
+            T0 = (PWM_Period - T1 - T2);
 
-            CMPA = round(T0);
-            CMPB = round(T2+T0);   
+            CMPA = roundf(T0);
+            CMPB = roundf(T2+T0);   
             
 
             EPWM_setCounterCompareValue(PhaseC_BASE, EPWM_COUNTER_COMPARE_A, CMPA);	
