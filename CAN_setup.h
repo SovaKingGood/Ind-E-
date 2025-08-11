@@ -19,6 +19,7 @@
 #define TX_MSG_OBJ_ID4 4
 #define TX_MSG_OBJ_ID5 5 //freq
 #define TX_MSG_OBJ_ID6 6 // amp
+#define TX_MSG_OBJ_ID7 7 // test
 #define BUTTON_GPIO 105  // GPIO 105 as button input
 
 //============CAN bus ID priority tags=================//
@@ -38,6 +39,7 @@
 #define DRV_MODE 0x116 //PARK / NEUTRAL / REVERSE
 #define frequency_can 0x117
 #define amplitude_can 0x118
+#define test 0x69
 
 #define BRAKE_STATUS 0x117 //ON or OFF
 #define WINDSHIELD_WIPER_STATUS 0x118 //!!!!!!!!!!!noooooooo wayyyyyyy
@@ -92,8 +94,8 @@ void CAN_send_setup(void)
     // for more information about the CAN module clocking.
     //
 
-    CAN_setBitRate(CANA_BASE, DEVICE_SYSCLK_FREQ, 500000, 16);
-    CAN_setBitRate(CANB_BASE, DEVICE_SYSCLK_FREQ, 500000, 16);
+    CAN_setBitRate(CANA_BASE, DEVICE_SYSCLK_FREQ, 250000, 16);
+    CAN_setBitRate(CANB_BASE, DEVICE_SYSCLK_FREQ, 250000, 16);
 
     //
     // Initialize the transmit message object used for sending CAN messages.
@@ -131,7 +133,47 @@ void CAN_send_setup(void)
     CAN_setupMessageObject(CANB_BASE, TX_MSG_OBJ_ID6, amplitude_can,
                            CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
                            CAN_MSG_OBJ_NO_FLAGS, MSG_DATA_LENGTH4); //set up CANB to respond to remote frames
-                            
+
+    CAN_setupMessageObject(CANB_BASE, TX_MSG_OBJ_ID7, test,
+                           CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
+                           CAN_MSG_OBJ_NO_FLAGS, MSG_DATA_LENGTH1); //set up CANB to respond to remote frames
+
+    CAN_setupMessageObject(CANB_BASE, 10, 0x123,
+                        CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
+                        CAN_MSG_OBJ_NO_FLAGS, 3); //set up CANB to respond to remote frames
+
+    CAN_setupMessageObject(CANB_BASE, 11, 0x113,
+                        CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
+                        CAN_MSG_OBJ_NO_FLAGS, 1); // THROTTLE
+                                    
+    CAN_setupMessageObject(CANB_BASE, 12, 0x115,
+                        CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
+                        CAN_MSG_OBJ_NO_FLAGS, 2); // RPM
+
+    CAN_setupMessageObject(CANB_BASE, 13, 0x200,
+                        CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
+                        CAN_MSG_OBJ_NO_FLAGS, 1); // HALL
+
+
+    CAN_setupMessageObject(CANB_BASE, 14, 0x103,
+                        CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
+                        CAN_MSG_OBJ_NO_FLAGS, 1); // Temp
+
+    CAN_setupMessageObject(CANB_BASE, 15, 0x300,
+                        CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
+                        CAN_MSG_OBJ_NO_FLAGS, 2); // Angle
+                                    
+
+    CAN_setupMessageObject(CANB_BASE, 16, 0x116,
+                        CAN_MSG_FRAME_STD, CAN_MSG_OBJ_TYPE_TX, 0,
+                        CAN_MSG_OBJ_NO_FLAGS, 1); // Duty
+
+                        
+    CAN_setupMessageObject(CANB_BASE, 17, 0x117893900,
+                        CAN_MSG_FRAME_EXT, CAN_MSG_OBJ_TYPE_TX, 0,
+                        CAN_MSG_OBJ_NO_FLAGS, 8); // DEMO SHITS       
+                                    
+    //
     //
     // Initialize the transmit message object data buffer to be sent
     //

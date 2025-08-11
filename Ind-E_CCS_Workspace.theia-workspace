@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "path": "file:///c%3A/Users/admin/OneDrive/IndE_Capstone/C2000"
+    }
+  ],
+  "settings": {},
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Ind-E_MotorController_CPU1 - Copy",
+        "type": "ccs-debug",
+        "request": "launch",
+        "projectInfo": {
+          "name": "Ind-E_MotorController_CPU1 - Copy",
+          "resourceId": "/Ind-E_MotorController_CPU1 - Copy"
+        }
+      }
+    ]
+  }
+}

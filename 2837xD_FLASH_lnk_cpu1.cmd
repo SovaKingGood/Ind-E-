@@ -79,7 +79,7 @@ SECTIONS
    .text               : >> FLASHB | FLASHC | FLASHD | FLASHE      PAGE = 0, ALIGN(8)
    codestart           : > BEGIN       PAGE = 0, ALIGN(8)
    /* Allocate uninitalized data sections: */
-   .stack              : > RAMM1       PAGE = 1
+   .stack              : > RAMGS0      PAGE = 1
    .switch             : > FLASHB      PAGE = 0, ALIGN(8)
    .reset              : > RESET,      PAGE = 0, TYPE = DSECT /* not used, */
 
